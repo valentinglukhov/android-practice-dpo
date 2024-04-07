@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Unsplash Demo Application</string>
+    <string name="photo_downloaded_snackbar">Фото было успешно скачано</string>
+    <string name="open_photo">Открыть фотографию</string>
+    <string name="open_photo_with">Открыть фотографию с:</string>
+    <string name="photos">Фотографии</string>
+    <string name="photo">Фотография</string>
+    <string name="collections">Коллеции</string>
+    <string name="profile">Профиль</string>
+    <string name="search_photos">Найти фото</string>
+    <string name="like_photo">Лайкнуть фото</string>
+    <string name="photo_downloaded">Фото скачалось</string>
+    <string name="click_to_open_downloaded_photo">Нажмите чтобы открыть фотографию</string>
+    <string name="no_location_data">нет данных по локации</string>
+    <string name="no_tag_data">нет тегов</string>
+    <string name="author">Автор: %1$s</string>
+    <string name="make">Снято на: %1$s</string>
+    <string name="model">Модель: %1$s</string>
+    <string name="exposure_time">Время выдержки: %1$s</string>
+    <string name="location">Локация: %1$s</string>
+    <string name="tags">Теги: %1$s</string>
+    <string name="download_this_photo">Скачать это фото</string>
+    <string name="share_this_photo">Поделиться этим фото</string>
+    <string name="view_geolocation">Посмотреть геолокацию фото</string>
+    <string name="close_photo_description">Закрыть описание фото</string>
+    <string name="collection_photo">Фото коллекции</string>
+    <string name="profile_photo">Аватар автора</string>
+    <string name="user_profile_info">Информация о пользователе:</string>
+    <string name="username">Никнейм: %1$s</string>
+    <string name="first_name">Имя: %1$s</string>
+    <string name="last_name">Фамилия: %1$s</string>
+    <string name="user_location">Локация: %1$s</string>
+    <string name="logout">Разлогиниться</string>
+    <string name="downloaded_photos">Скачанных фотографий</string>
+    <string name="liked_photos">Лайкнутых фотографий</string>
+    <string name="liked_photos_single">Лайкнутая фотография</string>
+    <string name="logout_text">Вы уверены что хотите разлогиниться?</string>
+    <string name="yes">Да</string>
+    <string name="no">Нет</string>
+    <string name="share_photo_with">Поделиться фото:</string>
+</resources>
