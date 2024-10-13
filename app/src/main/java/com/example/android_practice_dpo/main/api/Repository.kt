@@ -22,7 +22,7 @@ private const val GRANT_TYPE = "authorization_code"
 
 class Repository(
     context: Context,
-    private val access_token: String? = null
+    private val accessToken: String? = null
 ) {
     val photoDataBase = (context.applicationContext as App).photoDatabase
 
@@ -34,75 +34,75 @@ class Repository(
         query: String,
         page: Int,
     ): Response<SearchResults> {
-        val header = "Bearer $access_token"
+        val header = "Bearer $accessToken"
         Log.d("UNSPLASH_DEBUG", "repository Search $header")
-        return unsplashGetData.searchPhoto(query = query, page = page, per_page = 40, access_token = header)
+        return unsplashGetData.searchPhoto(query = query, page = page, perPage = 40, accessToken = header)
     }
 
     suspend fun downloadPhotoCounter(
         id: String,
     ): Response<ResponseBody> {
-        val header = "Bearer $access_token"
+        val header = "Bearer $accessToken"
         Log.d("UNSPLASH_DEBUG", "repository like $header")
-        return unsplashGetData.downloadPhotoCounter(id = id, access_token = header)
+        return unsplashGetData.downloadPhotoCounter(id = id, accessToken = header)
     }
 
     suspend fun unlikePhoto(
         id: String,
     ): Response<LikedPhoto> {
-        val header = "Bearer $access_token"
+        val header = "Bearer $accessToken"
         Log.d("UNSPLASH_DEBUG", "repository unlike $header")
-        return unsplashGetData.unlikePhoto(id = id, access_token = header)
+        return unsplashGetData.unlikePhoto(id = id, accessToken = header)
     }
 
     suspend fun likePhoto(
         id: String,
     ): Response<LikedPhoto> {
-        val header = "Bearer $access_token"
+        val header = "Bearer $accessToken"
         Log.d("UNSPLASH_DEBUG", "repository like $header")
-        return unsplashGetData.likePhoto(id = id, access_token = header)
+        return unsplashGetData.likePhoto(id = id, accessToken = header)
     }
 
     suspend fun getUserInfo(): Response<UnsplashUser> {
-        val header = "Bearer $access_token"
+        val header = "Bearer $accessToken"
         Log.d("UNSPLASH_DEBUG", "repository UserInfo $header")
-        return unsplashGetData.getUserInfo(access_token = header)
+        return unsplashGetData.getUserInfo(accessToken = header)
     }
 
     suspend fun getPhotoDescription(
         id: String,
     ): Response<PhotoDescription> {
-        val header = "Bearer $access_token"
+        val header = "Bearer $accessToken"
         Log.d("UNSPLASH_DEBUG", "repository Description $header")
-        return unsplashGetData.getPhotoDescription(id = id, access_token = header)
+        return unsplashGetData.getPhotoDescription(id = id, accessToken = header)
     }
 
     suspend fun getLikedPhotos(
         page: Int,
         username: String,
     ): Response<List<Photo>> {
-        val header = "Bearer $access_token"
+        val header = "Bearer $accessToken"
         Log.d("UNSPLASH_DEBUG", "repository Liked Photos $header")
-        return unsplashGetData.getLikedPhotos(username = username, page = page, access_token = header)
+        return unsplashGetData.getLikedPhotos(username = username, page = page, accessToken = header)
     }
 
     suspend fun getPagedPhotos(
         page: Int,
     ): List<Photo> {
-        val header = "Bearer $access_token"
+        val header = "Bearer $accessToken"
         Log.d("UNSPLASH_DEBUG", "repository PagedPhotos $header")
-        return unsplashGetData.getPagedPhotos(page = page, per_page = 40, access_token = header)
+        return unsplashGetData.getPagedPhotos(page = page, perPage = 40, accessToken = header)
     }
 
     suspend fun getPagedCollections(
         page: Int,
     ): Response<List<PhotoCollection>> {
-        val header = "Bearer $access_token"
+        val header = "Bearer $accessToken"
         Log.d("UNSPLASH_DEBUG", "repository PagedCollection $header")
         return unsplashGetData.getPagedCollections(
             page = page,
-            per_page = 40,
-            access_token = header
+            perPage = 40,
+            accessToken = header
         )
     }
 
@@ -110,24 +110,24 @@ class Repository(
         id: String?,
         page: Int,
     ): Response<List<Photo>> {
-        val header = "Bearer $access_token"
+        val header = "Bearer $accessToken"
         Log.d("UNSPLASH_DEBUG", "repository PagedCollectionsPhoto $header")
         return unsplashGetData.getPagedCollectionsPhoto(
             id = id,
             page = page,
-            per_page = 40,
-            access_token = header
+            perPage = 40,
+            accessToken = header
         )
     }
 
     suspend fun getToken(
-        client_id: String,
-        client_secret: String,
+        clientId: String,
+        clientSecret: String,
         code: String,
     ): Response<TokenData> {
         return unsplashAuthorization.getAuthorizationToken(
-            client_id,
-            client_secret,
+            clientId,
+            clientSecret,
             REDIRECT_URI,
             code,
             GRANT_TYPE
@@ -162,11 +162,11 @@ class Repository(
 interface UnsplashAuthorization {
     @POST("oauth/token")
     suspend fun getAuthorizationToken(
-        @Query("client_id") client_id: String,
-        @Query("client_secret") client_secret: String,
-        @Query("redirect_uri") redirect_uri: String,
+        @Query("client_id") clientId: String,
+        @Query("client_secret") clientSecret: String,
+        @Query("redirect_uri") redirectUri: String,
         @Query("code") code: String,
-        @Query("grant_type") grant_type: String,
+        @Query("grant_type") grantType: String,
     ): Response<TokenData>
 }
 
@@ -174,69 +174,69 @@ interface UnsplashApi {
     @GET("photos")
     suspend fun getPagedPhotos(
         @Query("page") page: Int,
-        @Query("per_page") per_page: Int = 10,
-        @Query("order_by") order_by: String = "latest",
-        @Header("Authorization") access_token: String
+        @Query("per_page") perPage: Int = 10,
+        @Query("order_by") orderBy: String = "latest",
+        @Header("Authorization") accessToken: String
     ): List<Photo>
 
     @GET("users/{username}/likes")
     suspend fun getLikedPhotos(
         @Path("username") username: String,
         @Query("page") page: Int,
-        @Query("per_page") per_page: Int = 40,
-        @Header("Authorization") access_token: String
+        @Query("per_page") perPage: Int = 40,
+        @Header("Authorization") accessToken: String
     ): Response<List<Photo>>
 
     @GET ("search/photos")
     suspend fun searchPhoto(
         @Query("query") query: String,
         @Query("page") page: Int,
-        @Query("per_page") per_page: Int = 40,
-        @Header("Authorization") access_token: String
+        @Query("per_page") perPage: Int = 40,
+        @Header("Authorization") accessToken: String
     ): Response<SearchResults>
 
     @DELETE("photos/{id}/like")
     suspend fun unlikePhoto(
         @Path("id") id: String,
-        @Header("Authorization") access_token: String
+        @Header("Authorization") accessToken: String
     ): Response<LikedPhoto>
 
     @POST("photos/{id}/like")
     suspend fun likePhoto(
         @Path("id") id: String,
-        @Header("Authorization") access_token: String
+        @Header("Authorization") accessToken: String
     ): Response<LikedPhoto>
 
     @GET("photos/{id}/download")
     suspend fun downloadPhotoCounter(
         @Path("id") id: String,
-        @Header("Authorization") access_token: String
+        @Header("Authorization") accessToken: String
     ): Response<ResponseBody>
 
     @GET("me")
     suspend fun getUserInfo(
-        @Header("Authorization") access_token: String
+        @Header("Authorization") accessToken: String
     ): Response<UnsplashUser>
 
     @GET("photos/{id}")
     suspend fun getPhotoDescription(
         @Path("id") id: String,
-        @Header("Authorization") access_token: String
+        @Header("Authorization") accessToken: String
     ): Response<PhotoDescription>
 
     @GET("collections")
     suspend fun getPagedCollections(
         @Query("page") page: Int,
-        @Query("per_page") per_page: Int = 10,
-        @Header("Authorization") access_token: String
+        @Query("per_page") perPage: Int = 10,
+        @Header("Authorization") accessToken: String
     ): Response<List<PhotoCollection>>
 
     @GET("collections/{id}/photos")
     suspend fun getPagedCollectionsPhoto(
         @Path("id") id: String?,
         @Query("page") page: Int,
-        @Query("per_page") per_page: Int = 10,
-        @Header("Authorization") access_token: String
+        @Query("per_page") perPage: Int = 10,
+        @Header("Authorization") accessToken: String
     ): Response<List<Photo>>
 
 }
@@ -248,11 +248,11 @@ class SearchResults(
 
 @JsonClass(generateAdapter = true)
 class TokenData(
-    @Json(name = "access_token") val access_token: String,
-    @Json(name = "token_type") val token_type: String,
-    @Json(name = "refresh_token") val refresh_token: String,
+    @Json(name = "access_token") val accessToken: String,
+    @Json(name = "token_type") val tokenType: String,
+    @Json(name = "refresh_token") val refreshToken: String,
     @Json(name = "scope") val scope: String,
-    @Json(name = "created_at") val created_at: Long
+    @Json(name = "created_at") val createdAt: Long
 )
 
 @JsonClass(generateAdapter = true)
@@ -275,7 +275,7 @@ class Url(
 
 class Links(
     @Json(name = "download") val download: String,
-    @Json(name = "download_location") val download_location: String,
+    @Json(name = "download_location") val downloadLocation: String,
 )
 
 class User(
@@ -296,7 +296,7 @@ class PhotoDescription(
     @Json(name = "user") val user: UserDescription,
     @Json(name = "downloads") val downloads: Int,
     @Json(name = "likes") val likes: Int,
-    @Json(name = "liked_by_user") val liked_by_user: Boolean,
+    @Json(name = "liked_by_user") val likedByUser: Boolean,
     @Json(name = "links") val links: Links,
     @Json(name = "urls") val urls: Url
 )
@@ -327,9 +327,9 @@ class Exif(
     @Json(name = "make") val make: String? = null,
     @Json(name = "model") val model: String? = null,
     @Json(name = "name") val name: String? = null,
-    @Json(name = "exposure_time") val exposure_time: String? = null,
+    @Json(name = "exposure_time") val exposureTime: String? = null,
     @Json(name = "aperture") val aperture: String? = null,
-    @Json(name = "focal_length") val focal_length: String? = null,
+    @Json(name = "focal_length") val focalLength: String? = null,
     @Json(name = "iso") val iso: Int? = null,
 )
 
@@ -338,7 +338,7 @@ class PhotoCollection(
     @Json(name = "id") val id: String,
     @Json(name = "title") val title: String,
     @Json(name = "user") val user: User,
-    @Json(name = "cover_photo") val cover_photo: CoverPhoto,
+    @Json(name = "cover_photo") val coverPhoto: CoverPhoto,
 )
 
 class CoverPhoto(
@@ -350,12 +350,12 @@ class CoverPhoto(
 class UnsplashUser(
     @Json(name = "id") val id: String,
     @Json(name = "username") val username: String,
-    @Json(name = "first_name") val first_name: String? = null,
-    @Json(name = "last_name") val last_name: String? = null,
+    @Json(name = "first_name") val firstName: String? = null,
+    @Json(name = "last_name") val lastName: String? = null,
     @Json(name = "location") val location: String? = null,
-    @Json(name = "total_likes") val total_likes: Int? = null,
-    @Json(name = "total_photos") val total_photos: Int? = null,
-    @Json(name = "total_collections") val total_collections: Int? = null,
+    @Json(name = "total_likes") val totalLikes: Int? = null,
+    @Json(name = "total_photos") val totalPhotos: Int? = null,
+    @Json(name = "total_collections") val totalCollections: Int? = null,
     @Json(name = "downloads") val downloads: Int? = null,
 )
 
@@ -372,12 +372,12 @@ fun UnsplashUser.toNonNull(): UnsplashUser {
     return UnsplashUser(
         id = id,
         username = username,
-        first_name = first_name ?: "no data",
-        last_name = last_name ?: "no data",
+        firstName = firstName ?: "no data",
+        lastName = lastName ?: "no data",
         location = location ?: "no data",
-        total_likes = total_likes ?: 0,
-        total_photos = total_photos ?: 0,
-        total_collections = total_collections ?: 0,
+        totalLikes = totalLikes ?: 0,
+        totalPhotos = totalPhotos ?: 0,
+        totalCollections = totalCollections ?: 0,
         downloads = downloads ?: 0
     )
 }
@@ -390,9 +390,9 @@ fun PhotoDescription.toNonNull(): PhotoDescription {
             make = exif.make ?: "no data",
             model = exif.model ?: "no data",
             name = exif.name ?: "no data",
-            exposure_time = exif.exposure_time ?: "no data",
+            exposureTime = exif.exposureTime ?: "no data",
             aperture = exif.aperture ?: "no data",
-            focal_length = exif.focal_length ?: "no data",
+            focalLength = exif.focalLength ?: "no data",
             iso = exif.iso
         ),
         location = Location(
@@ -407,8 +407,8 @@ fun PhotoDescription.toNonNull(): PhotoDescription {
         user = UserDescription(user.id, user.username, user.name, location = user.location),
         downloads = downloads,
         likes = likes,
-        liked_by_user = liked_by_user,
-        links = Links(links.download, links.download_location),
+        likedByUser = likedByUser,
+        links = Links(links.download, links.downloadLocation),
         urls = Url(raw = urls.raw, full = urls.full, regular = urls.regular, small = urls.small)
     )
 }
@@ -423,7 +423,7 @@ fun Photo.toPhotoEntity(): PhotoEntity {
         regularImageUrl = urls.regular,
         smallImageUrl = urls.small,
         downloadLink = links.download,
-        downloadLink_api = links.download_location,
+        downloadLinkApi = links.downloadLocation,
         likes = likes,
         likedByUser = likedByUser,
         userName = user.name,
@@ -436,7 +436,7 @@ fun PhotoEntity.toPhoto(): Photo {
         id = id,
         description = description,
         urls = Url(rawImageUrl, fullImageUrl, regularImageUrl, smallImageUrl),
-        links = Links(downloadLink, downloadLink_api),
+        links = Links(downloadLink, downloadLinkApi),
         likes = likes,
         likedByUser = likedByUser,
         user = User(

@@ -16,7 +16,7 @@ class ApplicationDataStoreManager(val context: Context) {
 
     suspend fun saveAccessToken(accessToken: String) {
         context.applicationDataStore.updateData { currentApplicationData ->
-            currentApplicationData.copy(access_token = accessToken)
+            currentApplicationData.copy(accessToken = accessToken)
         }
     }
 

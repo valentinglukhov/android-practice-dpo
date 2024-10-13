@@ -26,7 +26,6 @@ import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.*
-import androidx.compose.material3.SnackbarDuration.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
@@ -45,7 +44,6 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.*
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -68,7 +66,6 @@ import com.example.android_practice_dpo.main.api.*
 import com.example.android_practice_dpo.main.viewmodel.MainViewModel
 import com.example.android_practice_dpo.main.viewmodel.MainViewModelFactory
 import kotlinx.coroutines.launch
-import java.util.*
 import java.util.concurrent.TimeUnit
 
 private const val ACCESS_TOKEN = "access_token"
@@ -114,7 +111,7 @@ class MainFragment : Fragment() {
                 factory = MainViewModelFactory(
                     Repository(
                         context = LocalContext.current,
-                        access_token = accessToken
+                        accessToken = accessToken
                     )
                 )
             )
@@ -746,7 +743,7 @@ class MainFragment : Fragment() {
                                                 fontSize = 9.sp
                                             )
                                             Text(
-                                                text = getString(R.string.exposure_time, photo.exif.exposure_time),
+                                                text = getString(R.string.exposure_time, photo.exif.exposureTime),
                                                 fontSize = 9.sp
                                             )
                                             Text(
@@ -967,7 +964,7 @@ class MainFragment : Fragment() {
         ) {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.BottomCenter) {
                 GlideImage(
-                    model = collection.cover_photo.urls.regular,
+                    model = collection.coverPhoto.urls.regular,
                     contentDescription = getString(R.string.collection_photo),
                     contentScale = ContentScale.Crop,
                     modifier = Modifier.fillMaxWidth()
@@ -1033,7 +1030,7 @@ class MainFragment : Fragment() {
                                 tint = Color.Black
                             )
                             Text(
-                                text = collection.cover_photo.likes.toString(),
+                                text = collection.coverPhoto.likes.toString(),
                                 maxLines = 1,
                                 softWrap = false,
                                 color = Color.Black,
@@ -1094,8 +1091,8 @@ class MainFragment : Fragment() {
                     textAlign = TextAlign.Center
                 )
                 Text(text = getString(R.string.username, user.username))
-                Text(text = getString(R.string.first_name, user.first_name))
-                Text(text = getString(R.string.last_name, user.last_name))
+                Text(text = getString(R.string.first_name, user.firstName))
+                Text(text = getString(R.string.last_name, user.lastName))
                 Text(text = getString(R.string.user_location, user.location))
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -1145,7 +1142,7 @@ class MainFragment : Fragment() {
                             tint = Color.Black
                         )
                         Text(
-                            text = user.total_likes.toString(),
+                            text = user.totalLikes.toString(),
                             maxLines = 1,
                             color = Color.Black,
                             fontSize = 11.sp,
@@ -1283,7 +1280,7 @@ class MainFragment : Fragment() {
                     val response = photoDescriptionStateFlow.value
                     val photo = response!!.toNonNull()
                     val likeIconColor: Color =
-                        if (photo.liked_by_user) Color.Red else Color.Black
+                        if (photo.likedByUser) Color.Red else Color.Black
                     val tags: String = if (photo.tags.isEmpty()) {
                         getString(R.string.no_tag_data)
                     } else {
@@ -1334,7 +1331,7 @@ class MainFragment : Fragment() {
                                 fontSize = 11.sp
                             )
                             Text(
-                                text = getString(R.string.exposure_time, photo.exif.exposure_time),
+                                text = getString(R.string.exposure_time, photo.exif.exposureTime),
                                 fontSize = 11.sp
                             )
                             Text(

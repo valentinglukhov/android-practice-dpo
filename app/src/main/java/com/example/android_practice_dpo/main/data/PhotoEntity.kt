@@ -14,7 +14,7 @@ data class PhotoEntity(
     @ColumnInfo(name = "regularImageUrl") val regularImageUrl: String,
     @ColumnInfo(name = "smallImageUrl") val smallImageUrl: String,
     @ColumnInfo(name = "downloadLink") val downloadLink: String,
-    @ColumnInfo(name = "downloadLink_api") val downloadLink_api: String,
+    @ColumnInfo(name = "downloadLink_api") val downloadLinkApi: String,
     @ColumnInfo(name = "likes") val likes: Int,
     @ColumnInfo(name = "liked_by_user") val likedByUser: Boolean,
     @ColumnInfo(name = "userName") val userName: String,

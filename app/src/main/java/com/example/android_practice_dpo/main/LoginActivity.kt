@@ -130,7 +130,7 @@ class LoginActivity : AppCompatActivity() {
                                 "UNSPLASH_DEBUG",
                                 "LoginActivity ЗАПРОС УДАЧНЫЙ" + accessTokenResponse.isSuccessful.toString()
                             )
-                            accessToken = accessTokenResponse.body()?.access_token
+                            accessToken = accessTokenResponse.body()?.accessToken
                             sharedPreferences.edit().putString(ACCESS_TOKEN, accessToken).apply()
                             Log.d(
                                 "UNSPLASH_DEBUG",
