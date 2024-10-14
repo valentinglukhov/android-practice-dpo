@@ -14,16 +14,23 @@ import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.http.*
+import javax.inject.Inject
+import javax.inject.Singleton
 
 private const val AUTHORIZATION_URL = "https://unsplash.com/"
 private const val API_URL = "https://api.unsplash.com/"
 private const val REDIRECT_URI = "app://open.my.app"
 private const val GRANT_TYPE = "authorization_code"
 
-class Repository(
+@Singleton
+class Repository @Inject constructor(
     context: Context,
-    private val accessToken: String? = null
+    private var accessToken: String? = null
 ) {
+    fun refreshToken(token: String?) {
+        accessToken = token
+    }
+
     val photoDataBase = (context.applicationContext as App).photoDatabase
 
     init {

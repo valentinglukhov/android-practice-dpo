@@ -28,4 +28,15 @@ sealed class NavigationRoutes(
         R.drawable.icon_profile,
         "Button to switch to the user profile section"
     )
+
+    object SearchQuery : NavigationRoutes(
+        "searchQuery",
+        "searchQuery/{searchQuery}",
+        R.drawable.icon_profile,
+        "SearchQuery"
+    ) {
+        fun buildSearchQuery(searchQuery: String): String {
+            return "${NavigationRoutes.SearchQuery.route}/{$searchQuery}"
+        }
+    }
 }

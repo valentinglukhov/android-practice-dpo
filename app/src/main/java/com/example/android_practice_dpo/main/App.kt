@@ -6,9 +6,11 @@ import android.app.NotificationManager
 import android.os.Build
 import androidx.room.Room
 import com.example.android_practice_dpo.main.data.PhotoDatabase
+import dagger.hilt.android.HiltAndroidApp
 
 const val DOWNLOAD_NOTIFICATION_CHANNEL = "download_channel"
 
+@HiltAndroidApp
 class App : Application() {
     lateinit var photoDatabase: PhotoDatabase
     var appIsRunning: Boolean = false

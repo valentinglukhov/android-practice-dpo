@@ -12,11 +12,19 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.CircleShape
@@ -25,9 +33,33 @@ import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.State
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -44,7 +76,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.fragment.app.viewModels
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavType
@@ -55,22 +87,35 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
 import androidx.paging.LoadState
-import androidx.paging.compose.*
-import androidx.work.*
+import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.collectAsLazyPagingItems
+import androidx.paging.compose.itemContentType
+import androidx.paging.compose.itemKey
+import androidx.work.BackoffPolicy
+import androidx.work.Constraints
+import androidx.work.ExistingWorkPolicy
+import androidx.work.NetworkType
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
+import androidx.work.workDataOf
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.example.android_practice_dpo.R
-import com.example.android_practice_dpo.main.*
+import com.example.android_practice_dpo.main.LoginActivity
 import com.example.android_practice_dpo.main.adapter.DownloadWorker
-import com.example.android_practice_dpo.main.api.*
+import com.example.android_practice_dpo.main.api.Photo
+import com.example.android_practice_dpo.main.api.PhotoCollection
+import com.example.android_practice_dpo.main.api.PhotoDescription
+import com.example.android_practice_dpo.main.api.UnsplashUser
+import com.example.android_practice_dpo.main.api.toNonNull
 import com.example.android_practice_dpo.main.viewmodel.MainViewModel
-import com.example.android_practice_dpo.main.viewmodel.MainViewModelFactory
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 
 private const val ACCESS_TOKEN = "access_token"
 private const val COLLECTION_ID = "collectionId"
-private const val SETTINGS = "settings"
 private const val PHOTO_PATH = "photo_path"
 private const val PHOTO_ID = "photo_id"
 private const val PHOTO_QUERY = "photo_query"
@@ -78,43 +123,45 @@ private const val DOWNLOAD_PHOTO = "download_photo"
 private const val IMAGE_URI = "image_uri"
 private const val SEARCH_QUERY = "searchQuery"
 
-
+@AndroidEntryPoint
 class MainFragment : Fragment() {
 
-    private lateinit var viewModel: MainViewModel
+    @Inject lateinit var sharedPreferences: SharedPreferences
+    @Inject lateinit var workManager: WorkManager
+    private val viewModel: MainViewModel by viewModels()
     private lateinit var photoDescriptionStateFlow: State<PhotoDescription?>
     private lateinit var errorMessageFlow: State<String?>
     private lateinit var errorUserFlow: State<String?>
     private lateinit var userInfo: State<UnsplashUser?>
     private lateinit var photos: LazyPagingItems<Photo>
-    private lateinit var sharedPreferences: SharedPreferences
 
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        sharedPreferences =
-            activity?.getSharedPreferences(SETTINGS, AppCompatActivity.MODE_PRIVATE)!!
+//        sharedPreferences =
+//            activity?.getSharedPreferences(SETTINGS, AppCompatActivity.MODE_PRIVATE)!!
         val view = ComposeView(requireContext())
         var accessToken = activity?.intent?.extras?.getString(ACCESS_TOKEN)
         Log.d("UNSPLASH_DEBUG", "Получаем TOKEN из Intent " + accessToken.toString())
         if (sharedPreferences.contains(ACCESS_TOKEN)) {
             accessToken = sharedPreferences.getString(ACCESS_TOKEN, null)
+            viewModel.refreshToken(accessToken)
             Log.d("UNSPLASH_DEBUG", "Получаем TOKEN из shared " + accessToken.toString())
         }
         view.setContent {
             val navController = rememberNavController()
             val scope = rememberCoroutineScope()
 
-            viewModel = viewModel(
-                factory = MainViewModelFactory(
-                    Repository(
-                        context = LocalContext.current,
-                        accessToken = accessToken
-                    )
-                )
-            )
+//            viewModel = viewModel(
+//                factory = MainViewModelFactory(
+//                    Repository(
+//                        context = LocalContext.current,
+//                        accessToken = accessToken
+//                    )
+//                )
+//            )
 
             photos = viewModel.photosPagingFlow.collectAsLazyPagingItems()
             val collections = viewModel.photoCollectionFlow.collectAsLazyPagingItems()
@@ -133,7 +180,7 @@ class MainFragment : Fragment() {
                 mutableStateOf(PhotoWindow.Item(photo = null, false))
             }
 
-            val workManager = WorkManager.getInstance(requireContext())
+//            val workManager = WorkManager.getInstance(requireContext())
             val downloadState = workManager.getWorkInfosForUniqueWorkLiveData(DOWNLOAD_PHOTO)
                 .observeAsState()
                 .value
@@ -168,10 +215,6 @@ class MainFragment : Fragment() {
                         }
                     }
                 }
-            }
-
-            val collectionOnClickListener = remember {
-                mutableStateOf("photo")
             }
 
             val errorState by remember {
@@ -213,7 +256,7 @@ class MainFragment : Fragment() {
                                     label = { Text(screen.title, color = Color.Black) },
                                     selected = currentDestination?.hierarchy?.any { it.route == screen.route } == true,
                                     onClick = {
-                                        if (screen.route == "Collections") viewModel.clearCollectionsPhotoPagedSource()
+                                        if (screen.route == NavigationRoutes.Collections.route) viewModel.clearCollectionsPhotoPagedSource()
                                         navController.navigate(screen.route) {
                                             popUpTo(navController.graph.findStartDestination().id) {
                                                 saveState = true
@@ -243,7 +286,6 @@ class MainFragment : Fragment() {
                                     photos = photos,
                                     onPhotoClick = { photo ->
                                         photoWindowState.value = PhotoWindow.Item(photo, true)
-                                        collectionOnClickListener.value = "collection"
                                     }
                                 )
                                 PhotoPopUpWindow(photoWindowState = photoWindowState.value,
@@ -254,7 +296,7 @@ class MainFragment : Fragment() {
                                     onDownloadClick = { requestId -> requestIdState = requestId }
                                 )
                                 FloatingActionButton(onClick = {
-                                    navController.navigate("search_query") {
+                                    navController.navigate(NavigationRoutes.SearchQuery.route) {
                                         popUpTo(NavigationRoutes.Photos.route) {
                                             saveState = true
                                         }
@@ -270,7 +312,7 @@ class MainFragment : Fragment() {
                                 }
                             }
                         }
-                        composable("search_query") {
+                        composable(NavigationRoutes.SearchQuery.route) {
                             Row(
                                 modifier = Modifier.fillMaxSize(),
                                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -289,8 +331,8 @@ class MainFragment : Fragment() {
                                     shape = RoundedCornerShape(9.dp)
                                 )
                                 IconButton(onClick = {
-                                    navController.navigate("search/$searchQuery") {
-                                        popUpTo("search_query") {
+                                    navController.navigate(NavigationRoutes.SearchQuery.buildSearchQuery(searchQuery)) {
+                                        popUpTo(NavigationRoutes.SearchQuery.route) {
                                             saveState = true
                                         }
                                         launchSingleTop = true
@@ -306,7 +348,7 @@ class MainFragment : Fragment() {
                                 }
                             }
                         }
-                        composable(route = "search/{searchQuery}",
+                        composable(route = NavigationRoutes.SearchQuery.title,
                             arguments = listOf(
                                 navArgument(SEARCH_QUERY) {
                                     type = NavType.StringType
@@ -336,7 +378,7 @@ class MainFragment : Fragment() {
                                     }
                                 })
                         }
-                        composable(NavigationRoutes.Profile.route) {
+                        composable(route = NavigationRoutes.Profile.route) {
                             viewModel.getUserInfo()
                             ProfileScreen()
                         }
@@ -383,7 +425,6 @@ class MainFragment : Fragment() {
                                     photos = photos,
                                     onPhotoClick = { photo ->
                                         photoWindowState.value = PhotoWindow.Item(photo, true)
-                                        collectionOnClickListener.value = "collection"
                                     }
                                 )
                             }
@@ -1487,7 +1528,7 @@ class MainFragment : Fragment() {
             .build()
 
 
-        val workManager = WorkManager.getInstance(requireContext())
+//        val workManager = WorkManager.getInstance(requireContext())
         workManager.beginUniqueWork(
             DOWNLOAD_PHOTO,
             ExistingWorkPolicy.KEEP,

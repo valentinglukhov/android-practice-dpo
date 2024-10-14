@@ -4,6 +4,7 @@ plugins {
     id 'kotlin-parcelize'
     id 'org.jetbrains.kotlin.kapt'
     id 'org.jetbrains.kotlin.plugin.serialization'
+    id 'com.google.dagger.hilt.android'
 }
 
 android {
@@ -41,9 +42,15 @@ android {
     composeOptions {
         kotlinCompilerExtensionVersion = "1.4.1"
     }
+
+    kapt {
+        correctErrorTypes true
+    }
 }
 
 dependencies {
+    implementation 'com.google.dagger:hilt-android:2.52'
+    kapt 'com.google.dagger:hilt-compiler:2.52'
 
     // Saved state module for ViewModel
     def lifecycle_version = "2.6.1"

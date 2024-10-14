@@ -16,9 +16,11 @@ import com.example.android_practice_dpo.databinding.ActivityLoginBinding
 import com.example.android_practice_dpo.main.api.Repository
 import com.example.android_practice_dpo.main.api.TokenData
 import com.example.android_practice_dpo.main.data.ApplicationDataStoreManager
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
 import retrofit2.HttpException
 import retrofit2.Response
+import javax.inject.Inject
 
 private val REQUIRED_PERMISSIONS =
     arrayOf(
@@ -38,22 +40,22 @@ private const val CODE_QUERY = "code"
 private const val ERROR = "error"
 private const val ERROR_DESCRIPTION = "error_description"
 private const val CODE = "code"
-private const val SETTINGS = "settings"
 private const val ACCESS_TOKEN = "access_token"
 
+@AndroidEntryPoint
 class LoginActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityLoginBinding
-    private lateinit var repository: Repository
-    private lateinit var sharedPreferences: SharedPreferences
+    @Inject lateinit var repository: Repository
+    @Inject lateinit var sharedPreferences: SharedPreferences
 
-    private val applicationDataStoreManager = ApplicationDataStoreManager(context = this)
+    @Inject lateinit var applicationDataStoreManager: ApplicationDataStoreManager
     private var getSharedAuthorizationCode: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        sharedPreferences = getSharedPreferences(SETTINGS, MODE_PRIVATE)
-        repository = Repository(this)
+//        sharedPreferences = getSharedPreferences(SETTINGS, MODE_PRIVATE)
+//        repository = Repository(this)
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
         val intent = intent

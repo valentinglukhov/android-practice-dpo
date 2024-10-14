@@ -12,11 +12,14 @@ import androidx.paging.*
 import com.example.android_practice_dpo.main.adapter.*
 import com.example.android_practice_dpo.main.api.*
 import com.example.android_practice_dpo.main.data.PhotoEntity
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class MainViewModel(
+@HiltViewModel
+class MainViewModel @Inject constructor(
     private val repository: Repository,
     pager: Pager<Int, PhotoEntity>
 ) : ViewModel() {
@@ -50,6 +53,10 @@ class MainViewModel(
             .cachedIn(viewModelScope)
 
     var collectionsPhotoPagedSource: Flow<PagingData<Photo>>? = null
+
+    fun refreshToken(token: String?) {
+        repository.refreshToken(token)
+    }
 
     fun getPagedCollectionsPhoto(id: String?) {
         collectionsPhotoPagedSource = Pager(
@@ -203,7 +210,7 @@ class MainViewModel(
 }
 
 @Suppress("UNCHECKED_CAST")
-class MainViewModelFactory(private val repository: Repository) :
+class MainViewModelFactory @Inject constructor(private val repository: Repository) :
     ViewModelProvider.NewInstanceFactory() {
     override fun <T : ViewModel> create(modelClass: Class<T>): T =
         MainViewModel(repository, pagerFactory(repository = repository)) as T
