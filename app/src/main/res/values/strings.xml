@@ -40,4 +40,5 @@
     <string name="share_photo_with">Share photo with:</string>
     <string name="errorDescription" translatable="false">%1$s\n%2$s</string>
     <string name="check_connection">Please, check your internet connection and click login button again =)</string>
+    <string name="photo_filename" translatable="false">%1$s.jpg</string>
 </resources>

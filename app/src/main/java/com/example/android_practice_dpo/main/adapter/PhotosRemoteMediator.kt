@@ -11,9 +11,10 @@ import com.example.android_practice_dpo.main.data.PhotoDatabase
 import com.example.android_practice_dpo.main.data.PhotoEntity
 import retrofit2.HttpException
 import java.io.IOException
+import javax.inject.Inject
 
 @OptIn(ExperimentalPagingApi::class)
-class PhotosRemoteMediator(
+class PhotosRemoteMediator @Inject constructor(
     private val repository: Repository,
     private val photosDao: PhotoDatabase,
 ) : RemoteMediator<Int, PhotoEntity>() {

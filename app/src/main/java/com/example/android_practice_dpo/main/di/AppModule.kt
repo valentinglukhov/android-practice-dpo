@@ -6,6 +6,7 @@ import android.content.SharedPreferences
 import androidx.paging.ExperimentalPagingApi
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
+import androidx.paging.RemoteMediator
 import androidx.room.Room
 import androidx.work.WorkManager
 import com.example.android_practice_dpo.main.adapter.CollectionsPagingSource
@@ -33,6 +34,7 @@ import javax.inject.Singleton
 private const val SETTINGS = "settings"
 private const val API_URL = "https://api.unsplash.com/"
 private const val AUTHORIZATION_URL = "https://unsplash.com/"
+
 @Module
 @InstallIn(SingletonComponent::class)
 object AppModule {
@@ -68,7 +70,10 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun providesUnsplashAuthorizationApi(moshi: Moshi, httpClient: OkHttpClient): UnsplashAuthorizationApi {
+    fun providesUnsplashAuthorizationApi(
+        moshi: Moshi,
+        httpClient: OkHttpClient
+    ): UnsplashAuthorizationApi {
         return Retrofit.Builder()
             .baseUrl(AUTHORIZATION_URL)
             .client(httpClient)
@@ -96,26 +101,39 @@ object AppModule {
 
     @OptIn(ExperimentalPagingApi::class)
     @Provides
+    @Singleton
+    fun providesRemoteMediator(
+        repository: Repository,
+        photoDatabase: PhotoDatabase
+    ): RemoteMediator<Int, PhotoEntity> {
+        return PhotosRemoteMediator(
+            repository = repository,
+            photosDao = photoDatabase
+        )
+    }
+
+    @OptIn(ExperimentalPagingApi::class)
+    @Provides
     fun providesPhotosPagerFactory(
-        repository: Repository
+        repository: Repository,
+        photosRemoteMediator: PhotosRemoteMediator
     ): Pager<Int, PhotoEntity> {
         return Pager(
             config = PagingConfig(pageSize = 10),
             pagingSourceFactory = { repository.photoDataBase.photoDao().pagingSourcePhoto() },
-            remoteMediator = PhotosRemoteMediator(
-                repository = repository,
-                photosDao = repository.photoDataBase
-            )
+            remoteMediator = photosRemoteMediator
         )
     }
 
+
+
     @Provides
     fun providesCollectionPagerFactory(
-        repository: Repository
+        collectionsPagingSource: CollectionsPagingSource
     ): Pager<Int, PhotoCollection> {
         return Pager(
             config = PagingConfig(pageSize = 10),
-            pagingSourceFactory = { CollectionsPagingSource(repository) })
+            pagingSourceFactory = { collectionsPagingSource })
     }
 
 

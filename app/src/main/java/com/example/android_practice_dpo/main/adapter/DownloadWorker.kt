@@ -29,6 +29,10 @@ import kotlin.random.Random
 private const val PHOTO_PATH = "photo_path"
 private const val PHOTO_QUERY = "photo_query"
 private const val PHOTO_ID = "photo_id"
+private const val PROVIDER = ".provider"
+private const val NETWORK_ERROR = "Network error"
+private const val UNKNOWN_ERROR = "Unknown error"
+private const val MIME_IMAGE = "image/*"
 
 class DownloadWorker(
     private val context: Context,
@@ -44,7 +48,8 @@ class DownloadWorker(
         )
         response.body()?.let { body ->
             return withContext(Dispatchers.IO) {
-                val file = File(context.cacheDir, "${photoId}.jpg")
+                val file = File(context.cacheDir,
+                    context.getString(R.string.photo_filename, photoId))
                 val outputStream = FileOutputStream(file)
                 outputStream.use { stream ->
                     try {
@@ -55,7 +60,7 @@ class DownloadWorker(
                         )
                     }
                 }
-                val uri = FileProvider.getUriForFile(context, context.applicationContext.packageName + ".provider", file)
+                val uri = FileProvider.getUriForFile(context, context.applicationContext.packageName + PROVIDER, file)
                 createNotification(uri)
                 Result.success(
                     workDataOf(
@@ -69,11 +74,11 @@ class DownloadWorker(
                 return Result.retry()
             }
             return Result.failure(
-                workDataOf(WorkerKeys.ERROR_MSG to "Network error")
+                workDataOf(WorkerKeys.ERROR_MSG to NETWORK_ERROR)
             )
         }
         return Result.failure(
-            workDataOf(WorkerKeys.ERROR_MSG to "Unknown error")
+            workDataOf(WorkerKeys.ERROR_MSG to UNKNOWN_ERROR)
         )
     }
 
@@ -81,7 +86,7 @@ class DownloadWorker(
     fun createNotification(uri: Uri) {
         val intent = Intent(Intent.ACTION_VIEW).addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         Log.d("UNSPLASH_DEBUG", "ImageUri$uri")
-        intent.setDataAndType(uri, "image/*")
+        intent.setDataAndType(uri, MIME_IMAGE)
         val pendingIntent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_IMMUTABLE)
         } else {

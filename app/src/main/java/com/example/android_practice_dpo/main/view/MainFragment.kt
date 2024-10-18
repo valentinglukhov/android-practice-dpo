@@ -1517,7 +1517,6 @@ class MainFragment : Fragment() {
             .build()
 
 
-//        val workManager = WorkManager.getInstance(requireContext())
         workManager.beginUniqueWork(
             DOWNLOAD_PHOTO,
             ExistingWorkPolicy.KEEP,

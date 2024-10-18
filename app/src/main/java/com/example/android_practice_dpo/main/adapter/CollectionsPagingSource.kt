@@ -5,8 +5,9 @@ import androidx.paging.PagingState
 import com.example.android_practice_dpo.main.data.PhotoCollection
 import com.example.android_practice_dpo.main.api.Repository
 import retrofit2.HttpException
+import javax.inject.Inject
 
-class CollectionsPagingSource(
+class CollectionsPagingSource @Inject constructor(
     private val repository: Repository
 ) : PagingSource<Int, PhotoCollection>() {
 
