@@ -7,22 +7,25 @@ import android.os.Build
 import androidx.room.Room
 import com.example.android_practice_dpo.main.data.PhotoDatabase
 import dagger.hilt.android.HiltAndroidApp
+import javax.inject.Inject
 
 const val DOWNLOAD_NOTIFICATION_CHANNEL = "download_channel"
 
 @HiltAndroidApp
 class App : Application() {
-    lateinit var photoDatabase: PhotoDatabase
+
+//    @Inject
+//    lateinit var photoDatabase: PhotoDatabase
 
     override fun onCreate() {
         super.onCreate()
 
-        photoDatabase = Room.databaseBuilder(
-            applicationContext,
-            PhotoDatabase::class.java,
-            "photoDb.db"
-        )
-            .build()
+//        photoDatabase = Room.databaseBuilder(
+//            applicationContext,
+//            PhotoDatabase::class.java,
+//            "photoDb.db"
+//        )
+//            .build()
 
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(

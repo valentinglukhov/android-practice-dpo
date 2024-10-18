@@ -54,8 +54,6 @@ class LoginActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-//        sharedPreferences = getSharedPreferences(SETTINGS, MODE_PRIVATE)
-//        repository = Repository(this)
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
         val intent = intent
@@ -77,11 +75,7 @@ class LoginActivity : AppCompatActivity() {
 
     private fun authorize(intent: Intent) {
         if(sharedPreferences.contains(ACCESS_TOKEN)) {
-            val accessToken = sharedPreferences.getString(ACCESS_TOKEN, null)
-            Log.d("UNSPLASH_DEBUG", "Получаем TOKEN из Shared   $accessToken")
-            val loginIntent = Intent(this@LoginActivity, MainActivity::class.java)
-            loginIntent.putExtra(ACCESS_TOKEN, accessToken)
-            startActivity(loginIntent)
+            loginMainActivityIntent()
         } else {
             if (sharedPreferences.contains(CODE)) {
                 getSharedAuthorizationCode = sharedPreferences.getString(CODE, null)
@@ -101,16 +95,13 @@ class LoginActivity : AppCompatActivity() {
                 }
                 CoroutineScope(Dispatchers.IO).launch {
                     var authorizationCode: String? = null
-
                     val data = intent.data
-
                     if (data != null && data.queryParameterNames.contains(CODE_QUERY)) {
                         authorizationCode = data.getQueryParameter(CODE_QUERY)
                     } else {
                         if (getSharedAuthorizationCode != null) authorizationCode =
                             getSharedAuthorizationCode
                     }
-
                     if (authorizationCode != null) {
                         applicationDataStoreManager.saveAuthorizationCode(
                             authorizationCode
@@ -142,9 +133,7 @@ class LoginActivity : AppCompatActivity() {
                             val outcomingIntent = Intent(Intent.ACTION_VIEW, composeUrl())
                             startActivity(outcomingIntent)
                         }
-                        val loginIntent = Intent(this@LoginActivity, MainActivity::class.java)
-                        loginIntent.putExtra(ACCESS_TOKEN, accessToken)
-                        startActivity(loginIntent)
+                        loginMainActivityIntent()
                     } else {
                         val intentData = intent.data ?: return@launch
                         if (intentData.queryParameterNames.contains(ERROR)
@@ -168,6 +157,14 @@ class LoginActivity : AppCompatActivity() {
                 }
             }
         }
+    }
+
+    private fun loginMainActivityIntent() {
+        val accessToken = sharedPreferences.getString(ACCESS_TOKEN, null)
+        Log.d("UNSPLASH_DEBUG", "Получаем TOKEN из Shared   $accessToken")
+        val loginIntent = Intent(this@LoginActivity, MainActivity::class.java)
+        loginIntent.putExtra(ACCESS_TOKEN, accessToken)
+        startActivity(loginIntent)
     }
 
     private fun composeUrl(): Uri = Uri.parse("https://unsplash.com/oauth/authorize")

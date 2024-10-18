@@ -11,6 +11,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.*
 import com.example.android_practice_dpo.main.adapter.*
 import com.example.android_practice_dpo.main.api.*
+import com.example.android_practice_dpo.main.data.AccessToken
 import com.example.android_practice_dpo.main.data.Photo
 import com.example.android_practice_dpo.main.data.PhotoCollection
 import com.example.android_practice_dpo.main.data.PhotoDescription
@@ -61,7 +62,7 @@ class MainViewModel @Inject constructor(
     var collectionsPhotoPagedSource: Flow<PagingData<Photo>>? = null
 
     fun refreshToken(token: String?) {
-        repository.refreshToken(token)
+        repository.refreshToken(AccessToken(token))
     }
 
     fun getPagedCollectionsPhoto(id: String?) {

@@ -10,12 +10,14 @@ import androidx.room.Room
 import androidx.work.WorkManager
 import com.example.android_practice_dpo.main.adapter.PhotosRemoteMediator
 import com.example.android_practice_dpo.main.api.Repository
+import com.example.android_practice_dpo.main.data.AccessToken
 import com.example.android_practice_dpo.main.data.ApplicationDataStoreManager
 import com.example.android_practice_dpo.main.data.PhotoDatabase
 import com.example.android_practice_dpo.main.data.PhotoEntity
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ActivityContext
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 
@@ -61,7 +63,7 @@ object AppModule {
     }
 
     @Provides
-    fun providesToken(): String? = null
+    fun providesToken(): AccessToken = AccessToken(null)
 
     @Provides
     fun providesDataStoreManager(@ApplicationContext context: Context): ApplicationDataStoreManager {

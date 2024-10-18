@@ -1,11 +1,11 @@
 package com.example.android_practice_dpo.main.api
 
-import android.content.Context
 import android.util.Log
-import com.example.android_practice_dpo.main.App
+import com.example.android_practice_dpo.main.data.AccessToken
 import com.example.android_practice_dpo.main.data.LikedPhoto
 import com.example.android_practice_dpo.main.data.Photo
 import com.example.android_practice_dpo.main.data.PhotoCollection
+import com.example.android_practice_dpo.main.data.PhotoDatabase
 import com.example.android_practice_dpo.main.data.PhotoDescription
 import com.example.android_practice_dpo.main.data.SearchResults
 import com.example.android_practice_dpo.main.data.TokenData
@@ -28,14 +28,15 @@ private const val GRANT_TYPE = "authorization_code"
 
 @Singleton
 class Repository @Inject constructor(
-    context: Context,
-    private var accessToken: String? = null
+    private var accessToken: AccessToken?
 ) {
-    fun refreshToken(token: String?) {
+    @Inject
+    lateinit var photoDataBase: PhotoDatabase
+    fun refreshToken(token: AccessToken?) {
         accessToken = token
     }
 
-    val photoDataBase = (context.applicationContext as App).photoDatabase
+//    val photoDataBase = (context.applicationContext as App).photoDatabase
 
     init {
         Log.d("UNSPLASH_DEBUG", "repository init")
@@ -45,7 +46,7 @@ class Repository @Inject constructor(
         query: String,
         page: Int,
     ): Response<SearchResults> {
-        val header = "Bearer $accessToken"
+        val header = "Bearer ${accessToken?.value}"
         Log.d("UNSPLASH_DEBUG", "repository Search $header")
         return unsplashGetData.searchPhoto(query = query, page = page, perPage = 40, accessToken = header)
     }
@@ -53,7 +54,7 @@ class Repository @Inject constructor(
     suspend fun downloadPhotoCounter(
         id: String,
     ): Response<ResponseBody> {
-        val header = "Bearer $accessToken"
+        val header = "Bearer ${accessToken?.value}"
         Log.d("UNSPLASH_DEBUG", "repository like $header")
         return unsplashGetData.downloadPhotoCounter(id = id, accessToken = header)
     }
@@ -61,7 +62,7 @@ class Repository @Inject constructor(
     suspend fun unlikePhoto(
         id: String,
     ): Response<LikedPhoto> {
-        val header = "Bearer $accessToken"
+        val header = "Bearer ${accessToken?.value}"
         Log.d("UNSPLASH_DEBUG", "repository unlike $header")
         return unsplashGetData.unlikePhoto(id = id, accessToken = header)
     }
@@ -69,13 +70,13 @@ class Repository @Inject constructor(
     suspend fun likePhoto(
         id: String,
     ): Response<LikedPhoto> {
-        val header = "Bearer $accessToken"
+        val header = "Bearer ${accessToken?.value}"
         Log.d("UNSPLASH_DEBUG", "repository like $header")
         return unsplashGetData.likePhoto(id = id, accessToken = header)
     }
 
     suspend fun getUserInfo(): Response<UnsplashUser> {
-        val header = "Bearer $accessToken"
+        val header = "Bearer ${accessToken?.value}"
         Log.d("UNSPLASH_DEBUG", "repository UserInfo $header")
         return unsplashGetData.getUserInfo(accessToken = header)
     }
@@ -83,7 +84,7 @@ class Repository @Inject constructor(
     suspend fun getPhotoDescription(
         id: String,
     ): Response<PhotoDescription> {
-        val header = "Bearer $accessToken"
+        val header = "Bearer ${accessToken?.value}"
         Log.d("UNSPLASH_DEBUG", "repository Description $header")
         return unsplashGetData.getPhotoDescription(id = id, accessToken = header)
     }
@@ -92,7 +93,7 @@ class Repository @Inject constructor(
         page: Int,
         username: String,
     ): Response<List<Photo>> {
-        val header = "Bearer $accessToken"
+        val header = "Bearer ${accessToken?.value}"
         Log.d("UNSPLASH_DEBUG", "repository Liked Photos $header")
         return unsplashGetData.getLikedPhotos(username = username, page = page, accessToken = header)
     }
@@ -100,7 +101,7 @@ class Repository @Inject constructor(
     suspend fun getPagedPhotos(
         page: Int,
     ): List<Photo> {
-        val header = "Bearer $accessToken"
+        val header = "Bearer ${accessToken?.value}"
         Log.d("UNSPLASH_DEBUG", "repository PagedPhotos $header")
         return unsplashGetData.getPagedPhotos(page = page, perPage = 40, accessToken = header)
     }
@@ -108,7 +109,7 @@ class Repository @Inject constructor(
     suspend fun getPagedCollections(
         page: Int,
     ): Response<List<PhotoCollection>> {
-        val header = "Bearer $accessToken"
+        val header = "Bearer ${accessToken?.value}"
         Log.d("UNSPLASH_DEBUG", "repository PagedCollection $header")
         return unsplashGetData.getPagedCollections(
             page = page,
@@ -121,7 +122,7 @@ class Repository @Inject constructor(
         id: String?,
         page: Int,
     ): Response<List<Photo>> {
-        val header = "Bearer $accessToken"
+        val header = "Bearer ${accessToken?.value}"
         Log.d("UNSPLASH_DEBUG", "repository PagedCollectionsPhoto $header")
         return unsplashGetData.getPagedCollectionsPhoto(
             id = id,
