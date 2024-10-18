@@ -4,10 +4,17 @@ import com.example.android_practice_dpo.R
 
 sealed class NavigationRoutes(
     val route: String,
-    val title: String,
-    val icon: Int,
-    val contentDescription: String = ""
+    val title: String = "",
+    val icon: Int = 0,
+    val contentDescription: String = "",
+    val uriPattern: String = ""
 ) {
+
+    object SinglePhoto : NavigationRoutes(
+        route = "single_photo",
+        uriPattern = "https://unsplash.com/photos/{id}"
+    )
+
     object Photos : NavigationRoutes(
         "Photos",
         "Photos",
@@ -19,8 +26,13 @@ sealed class NavigationRoutes(
         "Collections",
         "Collections",
         R.drawable.icon_collections,
-        "button to switch to the section with collections of photos"
-    )
+        "button to switch to the section with collections of photos",
+        "collections/photo/{collectionId}"
+    ) {
+        fun collectionUriBuilder(collectionId: String): String {
+            return "collections/photo/$collectionId"
+        }
+    }
 
     object Profile : NavigationRoutes(
         "Profile",
@@ -34,6 +46,7 @@ sealed class NavigationRoutes(
         "searchQuery/{searchQuery}",
         R.drawable.icon_profile
     ) {
+
         fun buildSearchQuery(searchQuery: String): String {
             return "${SearchQuery.route}/{$searchQuery}"
         }

@@ -122,12 +122,18 @@ private const val PHOTO_QUERY = "photo_query"
 private const val DOWNLOAD_PHOTO = "download_photo"
 private const val IMAGE_URI = "image_uri"
 private const val SEARCH_QUERY = "searchQuery"
+private const val MIME_TEXT = "text/plain"
+private const val GOOGLE_MAPS = "com.google.android.apps.maps"
+private const val ID = "id"
 
 @AndroidEntryPoint
 class MainFragment : Fragment() {
 
-    @Inject lateinit var sharedPreferences: SharedPreferences
-    @Inject lateinit var workManager: WorkManager
+    @Inject
+    lateinit var sharedPreferences: SharedPreferences
+
+    @Inject
+    lateinit var workManager: WorkManager
     private val viewModel: MainViewModel by viewModels()
     private lateinit var photoDescriptionStateFlow: State<PhotoDescription?>
     private lateinit var errorMessageFlow: State<String?>
@@ -192,7 +198,8 @@ class MainFragment : Fragment() {
                 imageUri = info?.outputData?.getString(IMAGE_URI)
                 scope.launch {
                     if (imageUri != null) {
-                        val action = snackbarHostState.showSnackbar(getString(R.string.photo_downloaded_snackbar),
+                        val action = snackbarHostState.showSnackbar(
+                            getString(R.string.photo_downloaded_snackbar),
                             duration = SnackbarDuration.Long,
                             actionLabel = getString(R.string.open_photo)
                         )
@@ -200,7 +207,12 @@ class MainFragment : Fragment() {
                             val intent =
                                 Intent(Intent.ACTION_VIEW).addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                             intent.setDataAndType(imageUri!!.toUri(), "image/*")
-                            startActivity(Intent.createChooser(intent, getString(R.string.open_photo_with)))
+                            startActivity(
+                                Intent.createChooser(
+                                    intent,
+                                    getString(R.string.open_photo_with)
+                                )
+                            )
                         }
                     }
                 }
@@ -320,7 +332,11 @@ class MainFragment : Fragment() {
                                     shape = RoundedCornerShape(9.dp)
                                 )
                                 IconButton(onClick = {
-                                    navController.navigate(NavigationRoutes.SearchQuery.buildSearchQuery(searchQuery)) {
+                                    navController.navigate(
+                                        NavigationRoutes.SearchQuery.buildSearchQuery(
+                                            searchQuery
+                                        )
+                                    ) {
                                         popUpTo(NavigationRoutes.SearchQuery.route) {
                                             saveState = true
                                         }
@@ -358,13 +374,18 @@ class MainFragment : Fragment() {
                             CollectionsScreen(
                                 collections = collections,
                                 onCollectionClick = {
-                                    navController.navigate("collections/photo/${it.id}") {
-                                        popUpTo(NavigationRoutes.Collections.route) {
-                                            saveState = false
-                                            inclusive = true
+                                    navController
+                                        .navigate(
+                                            NavigationRoutes.Collections.collectionUriBuilder(
+                                                it.id
+                                            )
+                                        ) {
+                                            popUpTo(NavigationRoutes.Collections.route) {
+                                                saveState = false
+                                                inclusive = true
+                                            }
+                                            restoreState = false
                                         }
-                                        restoreState = false
-                                    }
                                 })
                         }
                         composable(route = NavigationRoutes.Profile.route) {
@@ -372,22 +393,22 @@ class MainFragment : Fragment() {
                             ProfileScreen()
                         }
                         composable(
-                            route = "single_photo",
+                            route = NavigationRoutes.SinglePhoto.route,
                             deepLinks = listOf(
                                 navDeepLink {
-                                    uriPattern = "https://unsplash.com/photos/{id}"
+                                    uriPattern = NavigationRoutes.SinglePhoto.uriPattern
                                     action = Intent.ACTION_VIEW
                                 }
                             ),
                             arguments = listOf(
-                                navArgument("id") {
+                                navArgument(ID) {
                                     type = NavType.StringType
                                     defaultValue = null
                                     nullable = true
                                 }
                             )
                         ) {
-                            val intentPhotoId: String? = it.arguments?.getString("id")
+                            val intentPhotoId: String? = it.arguments?.getString(ID)
                             LaunchedEffect(key1 = intentPhotoId) {
                                 intentPhotoId?.let { it1 -> viewModel.getPhotoDescription(it1) }
                             }
@@ -395,7 +416,7 @@ class MainFragment : Fragment() {
                                 onLikeClick = {},
                                 onDownloadClick = {})
                         }
-                        composable(route = "collections/photo/{collectionId}",
+                        composable(route = NavigationRoutes.Collections.uriPattern,
                             arguments = listOf(
                                 navArgument(COLLECTION_ID) {
                                     type = NavType.StringType
@@ -749,7 +770,8 @@ class MainFragment : Fragment() {
                                         } else {
                                             "${photo.location.position.latitude} / ${photo.location.position.longitude}"
                                         }
-                                    val enableLocation = location != getString(R.string.no_location_data)
+                                    val enableLocation =
+                                        location != getString(R.string.no_location_data)
                                     Card(
                                         modifier = Modifier
                                             .fillMaxWidth()
@@ -773,7 +795,10 @@ class MainFragment : Fragment() {
                                                 fontSize = 9.sp
                                             )
                                             Text(
-                                                text = getString(R.string.exposure_time, photo.exif.exposureTime),
+                                                text = getString(
+                                                    R.string.exposure_time,
+                                                    photo.exif.exposureTime
+                                                ),
                                                 fontSize = 9.sp
                                             )
                                             Text(
@@ -784,9 +809,11 @@ class MainFragment : Fragment() {
                                                 text = getString(R.string.tags, tags),
                                                 fontSize = 9.sp
                                             )
-                                            Row(modifier = Modifier.fillMaxWidth(),
-                                            verticalAlignment = Alignment.CenterVertically,
-                                            horizontalArrangement = Arrangement.SpaceEvenly) {
+                                            Row(
+                                                modifier = Modifier.fillMaxWidth(),
+                                                verticalAlignment = Alignment.CenterVertically,
+                                                horizontalArrangement = Arrangement.SpaceEvenly
+                                            ) {
                                                 Column(
                                                     modifier = Modifier
                                                         .fillMaxHeight()
@@ -1490,14 +1517,14 @@ class MainFragment : Fragment() {
     private fun openPhotoLocation(latitude: Double, longitude: Double) {
         val intentUri = Uri.parse("geo:0,0?q=$latitude,$longitude")
         val intent = Intent(Intent.ACTION_VIEW, intentUri)
-        intent.setPackage("com.google.android.apps.maps")
+        intent.setPackage(GOOGLE_MAPS)
         startActivity(intent)
     }
 
     private fun sharePhotoUrl(photoId: String) {
-        val photoUrl = "https://unsplash.com/photos/$photoId"
+        val photoUrl = getString(R.string.photo_url, photoId)
         val intent = Intent(Intent.ACTION_SEND)
-        intent.type = "text/plain"
+        intent.type = MIME_TEXT
         intent.putExtra(Intent.EXTRA_TEXT, photoUrl)
         startActivity(Intent.createChooser(intent, getString(R.string.share_photo_with)))
     }
