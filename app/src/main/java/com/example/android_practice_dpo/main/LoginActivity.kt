@@ -48,16 +48,20 @@ private const val AUTH_URI = "https://unsplash.com/oauth/authorize"
 private const val CLIENT_ID = "client_id"
 private const val REDIRECT = "redirect_uri"
 private const val REDIRECT_URI = "app://open.my.app"
+private const val BLANK_STRING = ""
 
 
 @AndroidEntryPoint
 class LoginActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityLoginBinding
+
     @Inject
     lateinit var repository: Repository
+
     @Inject
     lateinit var sharedPreferences: SharedPreferences
+
     @Inject
     lateinit var applicationDataStoreManager: ApplicationDataStoreManager
     private var getSharedAuthorizationCode: String? = null
@@ -71,7 +75,7 @@ class LoginActivity : AppCompatActivity() {
         if (intent.data != null) authorize(intent)
 
         binding.loginButton.setOnClickListener {
-            if (checkForInternet(this)) {
+            if (checkForInternet()) {
                 authorize(intent)
             } else {
                 toast(getString(R.string.check_connection))
@@ -95,7 +99,7 @@ class LoginActivity : AppCompatActivity() {
             } else {
                 runOnUiThread {
                     binding.loginButton.visibility = View.INVISIBLE
-                    binding.message.text = ""
+                    binding.message.text = BLANK_STRING
                 }
                 CoroutineScope(Dispatchers.IO).launch {
                     var authorizationCode: String? = null
@@ -122,10 +126,7 @@ class LoginActivity : AppCompatActivity() {
                             binding.message.text =
                                 getString(R.string.errorDescription, error, errorDescription)
                             toast(error.toString())
-                            Log.d(
-                                "UNSPLASH_DEBUG",
-                                error.toString() + errorDescription.toString()
-                            )
+                            Log.d("UNSPLASH_DEBUG", error.toString() + errorDescription.toString())
                         }
                     }
                 }
@@ -191,10 +192,10 @@ class LoginActivity : AppCompatActivity() {
         .appendQueryParameter(SCOPE, REQUIRED_PERMISSIONS.joinToString(" "))
         .build()
 
-    private fun checkForInternet(context: Context): Boolean {
+    private fun checkForInternet(): Boolean {
 
         val connectivityManager =
-            context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+            this.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             val network = connectivityManager.activeNetwork ?: return false
