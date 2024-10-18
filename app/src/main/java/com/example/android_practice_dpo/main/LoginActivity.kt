@@ -12,6 +12,7 @@ import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.example.android_practice_dpo.R
 import com.example.android_practice_dpo.databinding.ActivityLoginBinding
 import com.example.android_practice_dpo.main.api.Repository
 import com.example.android_practice_dpo.main.data.TokenData
@@ -41,15 +42,24 @@ private const val ERROR = "error"
 private const val ERROR_DESCRIPTION = "error_description"
 private const val CODE = "code"
 private const val ACCESS_TOKEN = "access_token"
+private const val RESPONSE_TYPE = "response_type"
+private const val SCOPE = "scope"
+private const val AUTH_URI = "https://unsplash.com/oauth/authorize"
+private const val CLIENT_ID = "client_id"
+private const val REDIRECT = "redirect_uri"
+private const val REDIRECT_URI = "app://open.my.app"
+
 
 @AndroidEntryPoint
 class LoginActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityLoginBinding
-    @Inject lateinit var repository: Repository
-    @Inject lateinit var sharedPreferences: SharedPreferences
-
-    @Inject lateinit var applicationDataStoreManager: ApplicationDataStoreManager
+    @Inject
+    lateinit var repository: Repository
+    @Inject
+    lateinit var sharedPreferences: SharedPreferences
+    @Inject
+    lateinit var applicationDataStoreManager: ApplicationDataStoreManager
     private var getSharedAuthorizationCode: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -64,30 +74,24 @@ class LoginActivity : AppCompatActivity() {
             if (checkForInternet(this)) {
                 authorize(intent)
             } else {
-                Toast.makeText(
-                    this,
-                    "Please, check your internet connection and click login button again =)",
-                    Toast.LENGTH_LONG
-                ).show()
+                toast(getString(R.string.check_connection))
             }
         }
     }
 
     private fun authorize(intent: Intent) {
-        if(sharedPreferences.contains(ACCESS_TOKEN)) {
-            loginMainActivityIntent()
+        if (sharedPreferences.contains(ACCESS_TOKEN)) {
+            mainActivityIntent()
         } else {
             if (sharedPreferences.contains(CODE)) {
                 getSharedAuthorizationCode = sharedPreferences.getString(CODE, null)
-                Log.d("UNSPLASH_DEBUG", "Получаем SHARED$getSharedAuthorizationCode")
+                Log.d("UNSPLASH_DEBUG", "Получаем SHARED $getSharedAuthorizationCode")
             }
-
-            Log.d("UNSPLASH_DEBUG", "Получаем интент$intent")
+            Log.d("UNSPLASH_DEBUG", "Получаем интент $intent")
             Log.d("UNSPLASH_DEBUG", (intent.action == Intent.ACTION_MAIN).toString())
             Log.d("UNSPLASH_DEBUG", (getSharedAuthorizationCode == null).toString())
             if (intent.action == Intent.ACTION_MAIN && getSharedAuthorizationCode == null) {
-                val outcomingIntent = Intent(Intent.ACTION_VIEW, composeUrl())
-                startActivity(outcomingIntent)
+                authIntent()
             } else {
                 runOnUiThread {
                     binding.loginButton.visibility = View.INVISIBLE
@@ -107,33 +111,7 @@ class LoginActivity : AppCompatActivity() {
                             authorizationCode
                         )
                         sharedPreferences.edit().putString(CODE, authorizationCode).apply()
-                        var accessTokenResponse: Response<TokenData>? = null
-                        try {
-                            accessTokenResponse = repository.getToken(
-                                ACCESS_KEY, SECRET_KEY,
-                                authorizationCode
-                            )
-                            Log.d("UNSPLASH_DEBUG", "repo$accessTokenResponse")
-                        } catch (e: HttpException) {
-                            Log.d("UNSPLASH_DEBUG", "Ошибка:" + e.localizedMessage)
-                        }
-                        var accessToken: String? = null
-                        if (accessTokenResponse?.isSuccessful == true && accessTokenResponse.code() == 200) {
-                            Log.d(
-                                "UNSPLASH_DEBUG",
-                                "LoginActivity ЗАПРОС УДАЧНЫЙ" + accessTokenResponse.isSuccessful.toString()
-                            )
-                            accessToken = accessTokenResponse.body()?.accessToken
-                            sharedPreferences.edit().putString(ACCESS_TOKEN, accessToken).apply()
-                            Log.d(
-                                "UNSPLASH_DEBUG",
-                                "LoginActivity получили ТОКЕН" + accessToken.toString()
-                            )
-                        } else {
-                            val outcomingIntent = Intent(Intent.ACTION_VIEW, composeUrl())
-                            startActivity(outcomingIntent)
-                        }
-                        loginMainActivityIntent()
+                        getAccessTokenAndResult(authorizationCode)
                     } else {
                         val intentData = intent.data ?: return@launch
                         if (intentData.queryParameterNames.contains(ERROR)
@@ -141,13 +119,9 @@ class LoginActivity : AppCompatActivity() {
                         ) {
                             val error = intentData.getQueryParameter(ERROR)
                             val errorDescription = intentData.getQueryParameter(ERROR_DESCRIPTION)
-                            binding.message.text = "$error\n$errorDescription"
-                            Toast.makeText(
-                                this@LoginActivity,
-                                error.toString(),
-                                Toast.LENGTH_LONG
-                            )
-                                .show()
+                            binding.message.text =
+                                getString(R.string.errorDescription, error, errorDescription)
+                            toast(error.toString())
                             Log.d(
                                 "UNSPLASH_DEBUG",
                                 error.toString() + errorDescription.toString()
@@ -159,7 +133,49 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
-    private fun loginMainActivityIntent() {
+    private suspend fun getAccessTokenAndResult(authorizationCode: String) {
+        var accessTokenResponse: Response<TokenData>? = null
+        try {
+            accessTokenResponse = repository.getToken(
+                ACCESS_KEY, SECRET_KEY,
+                authorizationCode
+            )
+            Log.d("UNSPLASH_DEBUG", "repo$accessTokenResponse")
+        } catch (e: HttpException) {
+            Log.d("UNSPLASH_DEBUG", "Ошибка:" + e.localizedMessage)
+        }
+        val accessToken: String?
+        if (accessTokenResponse?.isSuccessful == true && accessTokenResponse.code() == 200) {
+            Log.d(
+                "UNSPLASH_DEBUG",
+                "LoginActivity ЗАПРОС УДАЧНЫЙ" + accessTokenResponse.isSuccessful.toString()
+            )
+            accessToken = accessTokenResponse.body()?.accessToken
+            sharedPreferences.edit().putString(ACCESS_TOKEN, accessToken).apply()
+            Log.d(
+                "UNSPLASH_DEBUG",
+                "LoginActivity получили ТОКЕН" + accessToken.toString()
+            )
+        } else {
+            authIntent()
+        }
+        mainActivityIntent()
+    }
+
+    private fun toast(text: String) {
+        Toast.makeText(
+            this,
+            text,
+            Toast.LENGTH_LONG
+        ).show()
+    }
+
+    private fun authIntent() {
+        val outgoingIntent = Intent(Intent.ACTION_VIEW, composeUrl())
+        startActivity(outgoingIntent)
+    }
+
+    private fun mainActivityIntent() {
         val accessToken = sharedPreferences.getString(ACCESS_TOKEN, null)
         Log.d("UNSPLASH_DEBUG", "Получаем TOKEN из Shared   $accessToken")
         val loginIntent = Intent(this@LoginActivity, MainActivity::class.java)
@@ -167,15 +183,12 @@ class LoginActivity : AppCompatActivity() {
         startActivity(loginIntent)
     }
 
-    private fun composeUrl(): Uri = Uri.parse("https://unsplash.com/oauth/authorize")
+    private fun composeUrl(): Uri = Uri.parse(AUTH_URI)
         .buildUpon()
-        .appendQueryParameter("client_id", ACCESS_KEY)
-        .appendQueryParameter(
-            "redirect_uri",
-            "app://open.my.app"
-        )
-        .appendQueryParameter("response_type", CODE_QUERY)
-        .appendQueryParameter("scope", REQUIRED_PERMISSIONS.joinToString(" "))
+        .appendQueryParameter(CLIENT_ID, ACCESS_KEY)
+        .appendQueryParameter(REDIRECT, REDIRECT_URI)
+        .appendQueryParameter(RESPONSE_TYPE, CODE_QUERY)
+        .appendQueryParameter(SCOPE, REQUIRED_PERMISSIONS.joinToString(" "))
         .build()
 
     private fun checkForInternet(context: Context): Boolean {

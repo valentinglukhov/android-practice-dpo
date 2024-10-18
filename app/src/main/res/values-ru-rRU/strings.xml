@@ -39,4 +39,5 @@
     <string name="yes">Да</string>
     <string name="no">Нет</string>
     <string name="share_photo_with">Поделиться фото:</string>
+    <string name="check_connection">Пожалуйста, проверьте наличие интернет соединения и нажмите кнопку еще раз =)</string>
 </resources>
