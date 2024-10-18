@@ -136,6 +136,7 @@ class MainFragment : Fragment() {
     private lateinit var photos: LazyPagingItems<Photo>
 
 
+    @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?

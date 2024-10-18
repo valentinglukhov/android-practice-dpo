@@ -14,18 +14,8 @@ const val DOWNLOAD_NOTIFICATION_CHANNEL = "download_channel"
 @HiltAndroidApp
 class App : Application() {
 
-//    @Inject
-//    lateinit var photoDatabase: PhotoDatabase
-
     override fun onCreate() {
         super.onCreate()
-
-//        photoDatabase = Room.databaseBuilder(
-//            applicationContext,
-//            PhotoDatabase::class.java,
-//            "photoDb.db"
-//        )
-//            .build()
 
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
