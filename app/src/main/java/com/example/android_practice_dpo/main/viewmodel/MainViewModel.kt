@@ -6,11 +6,16 @@ import android.net.NetworkCapabilities
 import android.os.Build
 import android.util.Log
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import androidx.paging.*
-import com.example.android_practice_dpo.main.adapter.*
-import com.example.android_practice_dpo.main.api.*
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
+import androidx.paging.cachedIn
+import androidx.paging.map
+import com.example.android_practice_dpo.main.adapter.LikedPhotosPagingSource
+import com.example.android_practice_dpo.main.adapter.PhotoCollectionPagingSource
+import com.example.android_practice_dpo.main.adapter.SearchPhotosPagingSource
+import com.example.android_practice_dpo.main.api.Repository
 import com.example.android_practice_dpo.main.data.AccessToken
 import com.example.android_practice_dpo.main.data.Photo
 import com.example.android_practice_dpo.main.data.PhotoCollection
@@ -21,7 +26,10 @@ import com.example.android_practice_dpo.main.utils.toPhoto
 import com.example.android_practice_dpo.main.utils.toPhotoEntity
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
