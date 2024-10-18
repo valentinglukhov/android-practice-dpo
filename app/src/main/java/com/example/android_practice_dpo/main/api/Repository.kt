@@ -10,6 +10,7 @@ import com.example.android_practice_dpo.main.data.PhotoDescription
 import com.example.android_practice_dpo.main.data.SearchResults
 import com.example.android_practice_dpo.main.data.TokenData
 import com.example.android_practice_dpo.main.data.UnsplashUser
+import com.example.android_practice_dpo.main.utils.token
 import com.squareup.moshi.Moshi
 import okhttp3.OkHttpClient
 import okhttp3.ResponseBody
@@ -36,8 +37,6 @@ class Repository @Inject constructor(
         accessToken = token
     }
 
-//    val photoDataBase = (context.applicationContext as App).photoDatabase
-
     init {
         Log.d("UNSPLASH_DEBUG", "repository init")
     }
@@ -46,7 +45,7 @@ class Repository @Inject constructor(
         query: String,
         page: Int,
     ): Response<SearchResults> {
-        val header = "Bearer ${accessToken?.value}"
+        val header = accessToken!!.token()
         Log.d("UNSPLASH_DEBUG", "repository Search $header")
         return unsplashGetData.searchPhoto(query = query, page = page, perPage = 40, accessToken = header)
     }

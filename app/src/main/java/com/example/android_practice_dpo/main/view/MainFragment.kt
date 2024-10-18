@@ -140,8 +140,6 @@ class MainFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-//        sharedPreferences =
-//            activity?.getSharedPreferences(SETTINGS, AppCompatActivity.MODE_PRIVATE)!!
         val view = ComposeView(requireContext())
         var accessToken = activity?.intent?.extras?.getString(ACCESS_TOKEN)
         Log.d("UNSPLASH_DEBUG", "Получаем TOKEN из Intent " + accessToken.toString())
@@ -153,15 +151,6 @@ class MainFragment : Fragment() {
         view.setContent {
             val navController = rememberNavController()
             val scope = rememberCoroutineScope()
-
-//            viewModel = viewModel(
-//                factory = MainViewModelFactory(
-//                    Repository(
-//                        context = LocalContext.current,
-//                        accessToken = accessToken
-//                    )
-//                )
-//            )
 
             photos = viewModel.photosPagingFlow.collectAsLazyPagingItems()
             val collections = viewModel.photoCollectionFlow.collectAsLazyPagingItems()
@@ -180,7 +169,6 @@ class MainFragment : Fragment() {
                 mutableStateOf(PhotoWindow.Item(photo = null, false))
             }
 
-//            val workManager = WorkManager.getInstance(requireContext())
             val downloadState = workManager.getWorkInfosForUniqueWorkLiveData(DOWNLOAD_PHOTO)
                 .observeAsState()
                 .value

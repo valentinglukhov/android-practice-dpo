@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -15,7 +16,8 @@ class MainActivity : AppCompatActivity() {
 
     private val launcher =
         registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
-            if (permissions.values.all { it }) {
+            permissions.entries.forEach {
+                Log.d("UNSPLASH_DEBUG", "Permissions ${it.key} - ${it.value}")
             }
         }
     override fun onCreate(savedInstanceState: Bundle?) {

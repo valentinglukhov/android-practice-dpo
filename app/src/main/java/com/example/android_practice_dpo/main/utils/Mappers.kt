@@ -1,5 +1,6 @@
 package com.example.android_practice_dpo.main.utils
 
+import com.example.android_practice_dpo.main.data.AccessToken
 import com.example.android_practice_dpo.main.data.Exif
 import com.example.android_practice_dpo.main.data.Links
 import com.example.android_practice_dpo.main.data.Location
@@ -12,6 +13,10 @@ import com.example.android_practice_dpo.main.data.UnsplashUser
 import com.example.android_practice_dpo.main.data.Url
 import com.example.android_practice_dpo.main.data.User
 import com.example.android_practice_dpo.main.data.UserDescription
+
+fun AccessToken.token(): String {
+    return "Bearer ${this.value}"
+}
 
 fun UnsplashUser.toNonNull(): UnsplashUser {
     return UnsplashUser(
