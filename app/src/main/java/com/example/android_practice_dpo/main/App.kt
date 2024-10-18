@@ -13,11 +13,9 @@ const val DOWNLOAD_NOTIFICATION_CHANNEL = "download_channel"
 @HiltAndroidApp
 class App : Application() {
     lateinit var photoDatabase: PhotoDatabase
-    var appIsRunning: Boolean = false
 
     override fun onCreate() {
         super.onCreate()
-        appIsRunning = true
 
         photoDatabase = Room.databaseBuilder(
             applicationContext,

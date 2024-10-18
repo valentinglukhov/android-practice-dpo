@@ -36,7 +36,7 @@ sealed class NavigationRoutes(
         "SearchQuery"
     ) {
         fun buildSearchQuery(searchQuery: String): String {
-            return "${NavigationRoutes.SearchQuery.route}/{$searchQuery}"
+            return "${SearchQuery.route}/{$searchQuery}"
         }
     }
 }
