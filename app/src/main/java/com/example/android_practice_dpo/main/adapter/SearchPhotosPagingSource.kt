@@ -3,7 +3,7 @@ package com.example.android_practice_dpo.main.adapter
 import android.util.Log
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
-import com.example.android_practice_dpo.main.api.Photo
+import com.example.android_practice_dpo.main.data.Photo
 import com.example.android_practice_dpo.main.api.Repository
 import retrofit2.HttpException
 

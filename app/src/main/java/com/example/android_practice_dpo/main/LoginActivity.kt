@@ -14,7 +14,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.android_practice_dpo.databinding.ActivityLoginBinding
 import com.example.android_practice_dpo.main.api.Repository
-import com.example.android_practice_dpo.main.api.TokenData
+import com.example.android_practice_dpo.main.data.TokenData
 import com.example.android_practice_dpo.main.data.ApplicationDataStoreManager
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*

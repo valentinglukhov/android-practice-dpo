@@ -11,7 +11,13 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.*
 import com.example.android_practice_dpo.main.adapter.*
 import com.example.android_practice_dpo.main.api.*
+import com.example.android_practice_dpo.main.data.Photo
+import com.example.android_practice_dpo.main.data.PhotoCollection
+import com.example.android_practice_dpo.main.data.PhotoDescription
 import com.example.android_practice_dpo.main.data.PhotoEntity
+import com.example.android_practice_dpo.main.data.UnsplashUser
+import com.example.android_practice_dpo.main.utils.toPhoto
+import com.example.android_practice_dpo.main.utils.toPhotoEntity
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*

@@ -6,7 +6,7 @@ import androidx.paging.PagingState
 import androidx.paging.RemoteMediator
 import androidx.room.withTransaction
 import com.example.android_practice_dpo.main.api.Repository
-import com.example.android_practice_dpo.main.api.toPhotoEntity
+import com.example.android_practice_dpo.main.utils.toPhotoEntity
 import com.example.android_practice_dpo.main.data.PhotoDatabase
 import com.example.android_practice_dpo.main.data.PhotoEntity
 import retrofit2.HttpException

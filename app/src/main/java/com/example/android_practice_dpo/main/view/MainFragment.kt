@@ -103,11 +103,11 @@ import com.bumptech.glide.integration.compose.GlideImage
 import com.example.android_practice_dpo.R
 import com.example.android_practice_dpo.main.LoginActivity
 import com.example.android_practice_dpo.main.adapter.DownloadWorker
-import com.example.android_practice_dpo.main.api.Photo
-import com.example.android_practice_dpo.main.api.PhotoCollection
-import com.example.android_practice_dpo.main.api.PhotoDescription
-import com.example.android_practice_dpo.main.api.UnsplashUser
-import com.example.android_practice_dpo.main.api.toNonNull
+import com.example.android_practice_dpo.main.data.Photo
+import com.example.android_practice_dpo.main.data.PhotoCollection
+import com.example.android_practice_dpo.main.data.PhotoDescription
+import com.example.android_practice_dpo.main.data.UnsplashUser
+import com.example.android_practice_dpo.main.utils.toNonNull
 import com.example.android_practice_dpo.main.viewmodel.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
