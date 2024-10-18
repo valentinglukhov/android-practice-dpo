@@ -11,18 +11,11 @@ import com.example.android_practice_dpo.main.data.SearchResults
 import com.example.android_practice_dpo.main.data.TokenData
 import com.example.android_practice_dpo.main.data.UnsplashUser
 import com.example.android_practice_dpo.main.utils.token
-import com.squareup.moshi.Moshi
-import okhttp3.OkHttpClient
 import okhttp3.ResponseBody
-import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Response
-import retrofit2.Retrofit
-import retrofit2.converter.moshi.MoshiConverterFactory
 import javax.inject.Inject
 import javax.inject.Singleton
 
-private const val AUTHORIZATION_URL = "https://unsplash.com/"
-private const val API_URL = "https://api.unsplash.com/"
 private const val REDIRECT_URI = "app://open.my.app"
 private const val GRANT_TYPE = "authorization_code"
 
@@ -145,30 +138,6 @@ class Repository @Inject constructor(
             GRANT_TYPE
         )
     }
-
-//    private val moshi =
-//        Moshi.Builder().addLast(com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory())
-//            .build()
-//
-//    private val interceptor = HttpLoggingInterceptor().apply {
-//        level = HttpLoggingInterceptor.Level.BODY
-//    }
-//    private val httpClient = OkHttpClient.Builder().addInterceptor(interceptor).build()
-//
-//
-//    private val unsplashAuthorizationApi = Retrofit.Builder()
-//        .baseUrl(AUTHORIZATION_URL)
-//        .client(httpClient)
-//        .addConverterFactory(MoshiConverterFactory.create(moshi))
-//        .build()
-//        .create(UnsplashAuthorizationApi::class.java)
-//
-//    private val unsplashApi = Retrofit.Builder()
-//        .baseUrl(API_URL)
-//        .client(httpClient)
-//        .addConverterFactory(MoshiConverterFactory.create(moshi))
-//        .build()
-//        .create(UnsplashApi::class.java)
 }
 
 
