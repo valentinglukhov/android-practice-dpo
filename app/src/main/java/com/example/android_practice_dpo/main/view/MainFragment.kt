@@ -144,11 +144,11 @@ class MainFragment : Fragment() {
         val view = ComposeView(requireContext())
         var accessToken = activity?.intent?.extras?.getString(ACCESS_TOKEN)
         Log.d("UNSPLASH_DEBUG", "Получаем TOKEN из Intent " + accessToken.toString())
-        if (sharedPreferences.contains(ACCESS_TOKEN)) {
+        if (sharedPreferences.contains(ACCESS_TOKEN) && accessToken == null) {
             accessToken = sharedPreferences.getString(ACCESS_TOKEN, null)
-            viewModel.refreshToken(accessToken)
             Log.d("UNSPLASH_DEBUG", "Получаем TOKEN из shared " + accessToken.toString())
         }
+        viewModel.refreshToken(accessToken)
         view.setContent {
             val navController = rememberNavController()
             val scope = rememberCoroutineScope()

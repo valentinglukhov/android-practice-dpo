@@ -6,7 +6,7 @@ sealed class NavigationRoutes(
     val route: String,
     val title: String,
     val icon: Int,
-    val contentDescription: String
+    val contentDescription: String = ""
 ) {
     object Photos : NavigationRoutes(
         "Photos",
@@ -32,8 +32,7 @@ sealed class NavigationRoutes(
     object SearchQuery : NavigationRoutes(
         "searchQuery",
         "searchQuery/{searchQuery}",
-        R.drawable.icon_profile,
-        "SearchQuery"
+        R.drawable.icon_profile
     ) {
         fun buildSearchQuery(searchQuery: String): String {
             return "${SearchQuery.route}/{$searchQuery}"

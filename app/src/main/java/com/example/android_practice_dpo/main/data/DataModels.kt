@@ -4,12 +4,12 @@ import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
-class SearchResults(
+data class SearchResults(
     @Json(name = "results") val results: List<Photo>
 )
 
 @JsonClass(generateAdapter = true)
-class TokenData(
+data class TokenData(
     @Json(name = "access_token") val accessToken: String,
     @Json(name = "token_type") val tokenType: String,
     @Json(name = "refresh_token") val refreshToken: String,
@@ -28,29 +28,29 @@ data class Photo(
     @Json(name = "user") val user: User,
 )
 
-class Url(
+data class Url(
     @Json(name = "raw") val raw: String,
     @Json(name = "full") val full: String,
     @Json(name = "regular") val regular: String,
     @Json(name = "small") val small: String
 )
 
-class Links(
+data class Links(
     @Json(name = "download") val download: String,
     @Json(name = "download_location") val downloadLocation: String,
 )
 
-class User(
+data class User(
     @Json(name = "name") val name: String,
     @Json(name = "profile_image") val profileImage: ProfileImage
 )
 
-class ProfileImage(
+data class ProfileImage(
     @Json(name = "medium") val medium: String
 )
 
 @JsonClass(generateAdapter = true)
-class PhotoDescription(
+data class PhotoDescription(
     @Json(name = "id") val id: String,
     @Json(name = "exif") val exif: Exif,
     @Json(name = "location") val location: Location,
@@ -63,29 +63,29 @@ class PhotoDescription(
     @Json(name = "urls") val urls: Url
 )
 
-class UserDescription(
+data class UserDescription(
     @Json(name = "id") val id: String,
     @Json(name = "username") val username: String,
     @Json(name = "name") val name: String,
     @Json(name = "location") val location: String? = null,
 )
 
-class Tag(
+data class Tag(
     @Json(name = "title") val title: String
 )
 
-class Location(
+data class Location(
     @Json(name = "city") val city: String? = "no data",
     @Json(name = "country") val country: String? = "no data",
     @Json(name = "position") val position: Position? = null
 )
 
-class Position(
+data class Position(
     @Json(name = "latitude") val latitude: Double? = null,
     @Json(name = "longitude") val longitude: Double? = null
 )
 
-class Exif(
+data class Exif(
     @Json(name = "make") val make: String? = null,
     @Json(name = "model") val model: String? = null,
     @Json(name = "name") val name: String? = null,
@@ -96,20 +96,20 @@ class Exif(
 )
 
 @JsonClass(generateAdapter = true)
-class PhotoCollection(
+data class PhotoCollection(
     @Json(name = "id") val id: String,
     @Json(name = "title") val title: String,
     @Json(name = "user") val user: User,
     @Json(name = "cover_photo") val coverPhoto: CoverPhoto,
 )
 
-class CoverPhoto(
+data class CoverPhoto(
     @Json(name = "urls") val urls: Url,
     @Json(name = "likes") val likes: Int,
 )
 
 @JsonClass(generateAdapter = true)
-class UnsplashUser(
+data class UnsplashUser(
     @Json(name = "id") val id: String,
     @Json(name = "username") val username: String,
     @Json(name = "first_name") val firstName: String? = null,
@@ -121,11 +121,11 @@ class UnsplashUser(
     @Json(name = "downloads") val downloads: Int? = null,
 )
 
-class LikedPhoto(
+data class LikedPhoto(
     @Json(name = "photo") val photo: Info
 )
 
-class Info(
+data class Info(
     @Json(name = "id") val id: String,
     @Json(name = "likes") val likes: Int,
     @Json(name = "liked_by_user") val likedByUser: Boolean,

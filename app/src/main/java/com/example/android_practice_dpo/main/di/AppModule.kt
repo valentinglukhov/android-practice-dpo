@@ -8,12 +8,14 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.room.Room
 import androidx.work.WorkManager
+import com.example.android_practice_dpo.main.adapter.CollectionsPagingSource
 import com.example.android_practice_dpo.main.adapter.PhotosRemoteMediator
 import com.example.android_practice_dpo.main.api.Repository
 import com.example.android_practice_dpo.main.api.UnsplashApi
 import com.example.android_practice_dpo.main.api.UnsplashAuthorizationApi
 import com.example.android_practice_dpo.main.data.AccessToken
 import com.example.android_practice_dpo.main.data.ApplicationDataStoreManager
+import com.example.android_practice_dpo.main.data.PhotoCollection
 import com.example.android_practice_dpo.main.data.PhotoDatabase
 import com.example.android_practice_dpo.main.data.PhotoEntity
 import com.squareup.moshi.Moshi
@@ -94,7 +96,7 @@ object AppModule {
 
     @OptIn(ExperimentalPagingApi::class)
     @Provides
-    fun providesPagerFactory(
+    fun providesPhotosPagerFactory(
         repository: Repository
     ): Pager<Int, PhotoEntity> {
         return Pager(
@@ -105,6 +107,15 @@ object AppModule {
                 photosDao = repository.photoDataBase
             )
         )
+    }
+
+    @Provides
+    fun providesCollectionPagerFactory(
+        repository: Repository
+    ): Pager<Int, PhotoCollection> {
+        return Pager(
+            config = PagingConfig(pageSize = 10),
+            pagingSourceFactory = { CollectionsPagingSource(repository) })
     }
 
 

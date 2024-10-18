@@ -28,8 +28,12 @@ import javax.inject.Inject
 @HiltViewModel
 class MainViewModel @Inject constructor(
     private val repository: Repository,
-    pager: Pager<Int, PhotoEntity>
+    private val photosPager: Pager<Int, PhotoEntity>,
+    private val collectionPager: Pager<Int, PhotoCollection>
 ) : ViewModel() {
+
+    var searchPhotoPagedSource: Flow<PagingData<Photo>>? = null
+    var likedPhotoPagedSource: Flow<PagingData<Photo>>? = null
 
     private val _errorMessageFlow = MutableStateFlow<String?>(null)
     val errorMessageFlow = _errorMessageFlow.asStateFlow()
@@ -41,23 +45,21 @@ class MainViewModel @Inject constructor(
     val userInfoFlow = _userInfoFlow.asStateFlow()
 
     private val _errorUserFlow = MutableStateFlow<String?>(null)
+
     val errorUserFlow = _errorUserFlow.asStateFlow()
 
     private val _likePhotoFlow = MutableStateFlow<Boolean?>(null)
 
-    val photosPagingFlow = pager
+    val photosPagingFlow: Flow<PagingData<Photo>> = photosPager
         .flow
         .map { pagingData ->
             pagingData.map { it.toPhoto() }
         }
         .cachedIn(viewModelScope)
 
-    val photoCollectionFlow: Flow<PagingData<PhotoCollection>> =
-        Pager(
-            config = PagingConfig(pageSize = 10),
-            pagingSourceFactory = { CollectionsPagingSource(repository) })
-            .flow
-            .cachedIn(viewModelScope)
+    val photoCollectionFlow: Flow<PagingData<PhotoCollection>> = collectionPager
+        .flow
+        .cachedIn(viewModelScope)
 
     var collectionsPhotoPagedSource: Flow<PagingData<Photo>>? = null
 
@@ -77,23 +79,29 @@ class MainViewModel @Inject constructor(
         repository.downloadPhotoCounter(photoId)
     }
 
-    var searchPhotoPagedSource: Flow<PagingData<Photo>>? = null
-
     fun searchPhotosPagedSource(query: String) {
         Log.d("UNSPLASH_DEBUG", "viewmodel launched search $query")
         searchPhotoPagedSource = Pager(
             config = PagingConfig(pageSize = 10),
-            pagingSourceFactory = { SearchPhotosPagingSource(repository = repository, query = query) })
+            pagingSourceFactory = {
+                SearchPhotosPagingSource(
+                    repository = repository,
+                    query = query
+                )
+            })
             .flow
             .cachedIn(viewModelScope)
     }
 
-    var likedPhotoPagedSource: Flow<PagingData<Photo>>? = null
-
     fun getLikedPhotoPagedSource(username: String) {
         likedPhotoPagedSource = Pager(
             config = PagingConfig(pageSize = 10),
-            pagingSourceFactory = { LikedPhotosPagingSource(repository = repository, username = username) })
+            pagingSourceFactory = {
+                LikedPhotosPagingSource(
+                    repository = repository,
+                    username = username
+                )
+            })
             .flow
             .cachedIn(viewModelScope)
     }
@@ -118,7 +126,10 @@ class MainViewModel @Inject constructor(
                         Log.d("UNSPLASH_DEBUG", "Viewmodel ${response.isSuccessful}")
                         if (response.isSuccessful && response.code() == 200) {
                             val updatedPhoto =
-                                photo.copy(likedByUser = response.body()?.photo?.likedByUser!!, likes = response.body()?.photo?.likes!!)
+                                photo.copy(
+                                    likedByUser = response.body()?.photo?.likedByUser!!,
+                                    likes = response.body()?.photo?.likes!!
+                                )
                             repository.photoDataBase.photoDao()
                                 .updatePhoto(updatedPhoto.toPhotoEntity())
                             Log.d(
@@ -133,7 +144,10 @@ class MainViewModel @Inject constructor(
                         Log.d("UNSPLASH_DEBUG", "Viewmodel ${response.isSuccessful}")
                         if (response.isSuccessful && response.code() == 201) {
                             val updatedPhoto =
-                                photo.copy(likedByUser = response.body()?.photo?.likedByUser!!, likes = response.body()?.photo?.likes!!)
+                                photo.copy(
+                                    likedByUser = response.body()?.photo?.likedByUser!!,
+                                    likes = response.body()?.photo?.likes!!
+                                )
                             repository.photoDataBase.photoDao()
                                 .updatePhoto(updatedPhoto.toPhotoEntity())
                             Log.d(
@@ -214,25 +228,4 @@ class MainViewModel @Inject constructor(
             return networkInfo.isConnected
         }
     }
-}
-
-@Suppress("UNCHECKED_CAST")
-class MainViewModelFactory @Inject constructor(private val repository: Repository) :
-    ViewModelProvider.NewInstanceFactory() {
-    override fun <T : ViewModel> create(modelClass: Class<T>): T =
-        MainViewModel(repository, pagerFactory(repository = repository)) as T
-}
-
-@OptIn(ExperimentalPagingApi::class)
-fun pagerFactory(
-    repository: Repository
-): Pager<Int, PhotoEntity> {
-    return Pager(
-        config = PagingConfig(pageSize = 10),
-        pagingSourceFactory = { repository.photoDataBase.photoDao().pagingSourcePhoto() },
-        remoteMediator = PhotosRemoteMediator(
-            repository = repository,
-            photosDao = repository.photoDataBase
-        )
-    )
 }
