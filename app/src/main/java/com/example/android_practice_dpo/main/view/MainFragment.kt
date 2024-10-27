@@ -410,7 +410,7 @@ class MainFragment : Fragment() {
                         ) {
                             val intentPhotoId: String? = it.arguments?.getString(ID)
                             LaunchedEffect(key1 = intentPhotoId) {
-                                intentPhotoId?.let { it1 -> viewModel.getPhotoDescription(it1) }
+                                intentPhotoId?.let { photoId -> viewModel.getPhotoDescription(photoId) }
                             }
                             IntentPhotoScreen(
                                 onLikeClick = {},
